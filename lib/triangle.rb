@@ -1,33 +1,46 @@
-class TriangleError < StandardError
-end
-
 class Triangle
-  def initialize(a, b, c)
-    raise TriangleError, "Sides of a triangle cannot have negative or zero length" if a <= 0 || b <= 0 || c <= 0
-    raise TriangleError, "Triangle inequality is violated" if (a + b <= c) || (a + c <= b) || (b + c <= a)
-    @a, @b, @c = a, b, c
+  attr_accessor :l1, :l2, :l3
+  
+  def initialize(l1, l2, l3)
+    @l1 = l1
+    @l2 = l2
+    @l3 = l3
   end
 
   def kind
-    if @a == @b && @b == @c
-      :equilateral
-    elsif @a == @b || @a == @c || @b == @c
-      :isosceles
+    if (self.valid?)
+      self.type
     else
+      raise TriangleError
+    end
+  end
+
+  def valid?
+    sum1 = self.l1 + self.l2
+    sum2 = self.l1 + self.l3
+    sum3 = self.l2 + self.l3
+    if (self.l1 <= 0 || self.l2 <= 0 || self.l3 <= 0)
+      false
+    elsif (sum1 <= self.l3 || sum2 <= self.l2 || sum3 <= self.l1)
+      false
+    else
+      true
+    end
+  end
+
+  def type
+    if (self.l1 == self.l2 && self.l1 == self.l3)
+      :equilateral
+    elsif (self.l1 == self.l2 || self.l1 == self.l3 || self.l2 == self.l3)
+      :isosceles
+    else 
       :scalene
     end
   end
-end
 
-begin
-  triangle = Triangle.new(3, 3, 3)
-  puts triangle.kind # returns: equilateral
-  
-  triangle = Triangle.new(2, 2, 3)
-  puts triangle.kind # returns: isosceles
-  
-  triangle = Triangle.new(3, 4, 5)
-  puts triangle.kind # returns: scalene
-rescue TriangleError => e
-  puts e.message
+  class TriangleError < StandardError
+    def message
+      "This is not a valid triangle"
+    end
+  end
 end
